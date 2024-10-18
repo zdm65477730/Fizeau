@@ -79,6 +79,7 @@ FizeauOverlayGui::FizeauOverlayGui() {
             "ColorRangeLimitedFizeauOverlayGuiListItemText": "Limited",
             "FilterFizeauOverlayGuiCategoryHeaderText": "Filter",
             "TemperatureFizeauOverlayGuiCategoryHeaderText": "Temperature: %u°K",
+            "HueFizeauOverlayGuiCategoryHeaderText": "Hue: %.2f",
             "BrightnessFizeauOverlayGuiCategoryHeaderText": "Brightness: %.2f",
             "GammaFizeauOverlayGuiCategoryHeaderText": "Gamma: %.2f",
             "SaturationFizeauOverlayGuiCategoryHeaderText": "Saturation: %.2f",
@@ -197,6 +198,22 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
             val * (MAX_SAT - MIN_SAT) / 100 + MIN_SAT;
     });
 
+    this->hue_slider = new tsl::elm::TrackBar("");
+    this->hue_slider->setProgress(((this->is_day ? this->config.profile.day_settings.hue : this->config.profile.night_settings.hue) - MIN_HUE)
+        * 100 / (MAX_HUE - MIN_HUE));
+    this->hue_slider->setClickListener([this](std::uint64_t keys) {
+        if (keys & HidNpadButton_Y) {
+            this->hue_slider->setProgress((DEFAULT_HUE - MIN_HUE) * 100 / (MAX_HUE - MIN_HUE));
+            (this->is_day ? this->config.profile.day_settings.hue : this->config.profile.night_settings.hue) = DEFAULT_HUE;
+            return true;
+        }
+        return false;
+    });
+    this->hue_slider->setValueChangedListener([this](std::uint8_t val) {
+        (this->is_day ? this->config.profile.day_settings.hue : this->config.profile.night_settings.hue) =
+            val * (MAX_HUE - MIN_HUE) / 100 + MIN_HUE;
+    });
+
     this->luma_slider = new tsl::elm::TrackBar("");
     this->luma_slider->setProgress(((this->is_day ? this->config.profile.day_settings.luminance : this->config.profile.night_settings.luminance) - MIN_LUMA)
         * 100 / (MAX_LUMA - MIN_LUMA));
@@ -246,6 +263,7 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
     this->filter_header     = new tsl::elm::CategoryHeader("FilterFizeauOverlayGuiCategoryHeaderText"_tr);
     this->gamma_header      = new tsl::elm::CategoryHeader("");
     this->sat_header        = new tsl::elm::CategoryHeader("");
+    this->hue_header        = new tsl::elm::CategoryHeader("");
     this->luma_header       = new tsl::elm::CategoryHeader("");
 
     auto *frame = new tsl::elm::OverlayFrame("PluginName"_tr, VERSION);
@@ -255,6 +273,10 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
     list->addItem(this->apply_button);
     list->addItem(this->temp_header);
     list->addItem(this->temp_slider);
+    list->addItem(this->sat_header);
+    list->addItem(this->sat_slider);
+    list->addItem(this->hue_header);
+    list->addItem(this->hue_slider);
 
     list->addItem(this->gamma_header);
     list->addItem(this->gamma_slider);
@@ -277,6 +299,8 @@ void FizeauOverlayGui::update() {
 
     this->temp_header->setText(format("TemperatureFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.temperature : this->config.profile.night_settings.temperature));
+    this->hue_header->setText(format("HueFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
+        this->is_day ? this->config.profile.day_settings.hue         : this->config.profile.night_settings.hue));
     this->gamma_header->setText(format("GammaFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.gamma       : this->config.profile.night_settings.gamma));
     this->sat_header->setText(format("SaturationFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),

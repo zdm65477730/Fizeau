@@ -22,6 +22,7 @@
     "ColorRangeLimitedFizeauOverlayGuiListItemText": "有限",
     "FilterFizeauOverlayGuiCategoryHeaderText": "篩選",
     "TemperatureFizeauOverlayGuiCategoryHeaderText": "溫度：%u°K",
+    "HueFizeauOverlayGuiCategoryHeaderText": "色調：%.2f",
     "BrightnessFizeauOverlayGuiCategoryHeaderText": "發光亮度：%.2f",
     "GammaFizeauOverlayGuiCategoryHeaderText": "伽瑪：%.2f",
     "SaturationFizeauOverlayGuiCategoryHeaderText": "飽和度：%.2f",
