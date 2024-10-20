@@ -222,7 +222,7 @@ Result Config::apply() {
 Result Config::reset() {
     this->profile.day_settings.temperature = DEFAULT_TEMP,     this->profile.night_settings.temperature = DEFAULT_TEMP;
     this->profile.day_settings.gamma       = DEFAULT_GAMMA,    this->profile.night_settings.gamma       = DEFAULT_GAMMA;
-    this->profile.day_settings.hue         = DEFAULT_HUE, this->profile.night_settings.hue = DEFAULT_HUE;
+    this->profile.day_settings.hue         = DEFAULT_HUE,      this->profile.night_settings.hue         = DEFAULT_HUE;
     this->profile.day_settings.saturation  = DEFAULT_SAT,      this->profile.night_settings.saturation  = DEFAULT_SAT;
     this->profile.day_settings.luminance   = DEFAULT_LUMA,     this->profile.night_settings.luminance   = DEFAULT_LUMA;
     this->profile.day_settings.range       = DEFAULT_RANGE,    this->profile.night_settings.range       = DEFAULT_RANGE;

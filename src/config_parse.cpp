@@ -1,6 +1,5 @@
 #include <cstring>
 #include <cstdlib>
-#include <strings.h>
 
 #include "config.hpp"
 

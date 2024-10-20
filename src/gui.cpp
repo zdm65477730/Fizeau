@@ -1,4 +1,4 @@
-// Copyright (C) 2024 averne
+// Copyright (c) 2024 averne
 //
 // This file is part of Fizeau.
 //
@@ -268,6 +268,7 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
 
     auto *frame = new tsl::elm::OverlayFrame("PluginName"_tr, VERSION);
     auto *list = new tsl::elm::List();
+
     list->addItem(this->info_header, 60);
     list->addItem(this->active_button);
     list->addItem(this->apply_button);
@@ -280,8 +281,6 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
 
     list->addItem(this->gamma_header);
     list->addItem(this->gamma_slider);
-    list->addItem(this->sat_header);
-    list->addItem(this->sat_slider);
     list->addItem(this->luma_header);
     list->addItem(this->luma_slider);
     list->addItem(this->filter_header);
@@ -299,12 +298,12 @@ void FizeauOverlayGui::update() {
 
     this->temp_header->setText(format("TemperatureFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.temperature : this->config.profile.night_settings.temperature));
-    this->hue_header->setText(format("HueFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
-        this->is_day ? this->config.profile.day_settings.hue         : this->config.profile.night_settings.hue));
     this->gamma_header->setText(format("GammaFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.gamma       : this->config.profile.night_settings.gamma));
     this->sat_header->setText(format("SaturationFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.saturation  : this->config.profile.night_settings.saturation));
+    this->hue_header->setText(format("HueFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
+        this->is_day ? this->config.profile.day_settings.hue         : this->config.profile.night_settings.hue));
     this->luma_header->setText(format("LuminanceFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.luminance   : this->config.profile.night_settings.luminance));
 }
