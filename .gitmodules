@@ -6,7 +6,7 @@
 	url = https://github.com/benhoyt/inih.git
 [submodule "lib/libtesla"]
 	path = lib/libtesla
-	url = https://github.com/WerWolv/libtesla.git
+	url = https://github.com/zdm65477730/libtesla.git
 [submodule "lib/nvjpg/oss-nvjpg"]
 	path = lib/nvjpg/oss-nvjpg
 	url = https://github.com/averne/oss-nvjpg.git

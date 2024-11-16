@@ -21,7 +21,7 @@
 **/build/
 **/release/
 **/debug/
-**/out/
+**/SdOut/
 **/env/
 
 misc/patches
