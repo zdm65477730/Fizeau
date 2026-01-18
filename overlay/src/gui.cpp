@@ -17,6 +17,9 @@
 
 #include "gui.hpp"
 
+using json = nlohmann::json;
+using namespace tsl;
+
 namespace fz {
 
 namespace {
@@ -35,16 +38,16 @@ bool is_full(const ColorRange &range) {
 } // namespace
 
 tsl::elm::Element *ErrorGui::createUI() {
-    auto *frame = new tsl::elm::OverlayFrame("Fizeau", VERSION);
+    auto *frame = new tsl::elm::OverlayFrame("PluginName"_tr, VERSION);
 
     auto *drawer = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, s32 x, s32 y, s32 w, s32 h) {
         renderer->drawString(format("%#x (%04d-%04d)", this->rc, R_MODULE(this->rc) + 2000, R_DESCRIPTION(this->rc)).c_str(),
                                                                      false, x, y +  50, 20, renderer->a(0xffff));
-        renderer->drawString("An error occurred",                    false, x, y +  80, 20, renderer->a(0xffff));
-        renderer->drawString("Please make sure you are using the",   false, x, y + 110, 20, renderer->a(0xffff));
-        renderer->drawString("latest release.",                      false, x, y + 130, 20, renderer->a(0xffff));
-        renderer->drawString("Otherwise, make an issue on github:",  false, x, y + 150, 20, renderer->a(0xffff));
-        renderer->drawString("https://www.github.com/averne/Fizeau", false, x, y + 170, 18, renderer->a(0xffff));
+        renderer->drawString("ErrorOccurredTitleErrorGuiOverlayFrameText"_tr.c_str(),                    false, x, y +  80, 20, renderer->a(0xffff));
+        renderer->drawString("ErrorOccurredTextLine1ErrorGuiOverlayFrameText"_tr.c_str(),   false, x, y + 110, 20, renderer->a(0xffff));
+        renderer->drawString("ErrorOccurredTextLine2ErrorGuiOverlayFrameText"_tr.c_str(),                      false, x, y + 130, 20, renderer->a(0xffff));
+        renderer->drawString("ErrorOccurredTextLine3ErrorGuiOverlayFrameText"_tr.c_str(),  false, x, y + 150, 20, renderer->a(0xffff));
+        renderer->drawString("ErrorOccurredTextLine4ErrorGuiOverlayFrameText"_tr.c_str(), false, x, y + 170, 18, renderer->a(0xffff));
     });
 
     frame->setContent(drawer);
@@ -52,6 +55,50 @@ tsl::elm::Element *ErrorGui::createUI() {
 }
 
 FizeauOverlayGui::FizeauOverlayGui() {
+    std::string jsonStr = R"(
+        {
+            "PluginName": "Fizeau",
+            "ErrorOccurredTitleErrorGuiOverlayFrameText": "An error occurred",
+            "ErrorOccurredTextLine1ErrorGuiOverlayFrameText": "Please make sure you are using the",
+            "ErrorOccurredTextLine2ErrorGuiOverlayFrameText": "latest release.",
+            "ErrorOccurredTextLine3ErrorGuiOverlayFrameText": "Otherwise, make an issue on github:",
+            "ErrorOccurredTextLine4ErrorGuiOverlayFrameText": "https://www.github.com/averne/Fizeau",
+            "EditProfileFizeauOverlayGuiCustomDrawerText": "Editing profile: %u",
+            "ProfileInPeriodFizeauOverlayGuiCustomDrawerText": "In period: %s",
+            "ProfileInPeriodDayFizeauOverlayGuiCustomDrawerText": "day",
+            "ProfileInPeriodNightFizeauOverlayGuiCustomDrawerText": "night",
+            "CorrectionFizeauOverlayGuiListItemText": "Correction active",
+            "CorrectionActiveFizeauOverlayGuiListItemText": "Active",
+            "CorrectionInactiveFizeauOverlayGuiListItemText": "Inactive",
+            "ApplySettingsFizeauOverlayGuiListItemText": "Apply settings",
+            "NoneFizeauOverlayGuiNamedStepTrackBarText": "None",
+            "RedFizeauOverlayGuiNamedStepTrackBarText": "Red",
+            "GreenFizeauOverlayGuiNamedStepTrackBarText": "Green",
+            "BlueFizeauOverlayGuiNamedStepTrackBarText": "Blue",
+            "RedGreenFizeauOverlayGuiNamedStepTrackBarText": "RG",
+            "RedBlueFizeauOverlayGuiNamedStepTrackBarText": "RB",
+            "GreenBlueFizeauOverlayGuiNamedStepTrackBarText": "GB",
+            "AllFizeauOverlayGuiNamedStepTrackBarText": "All",
+            "ColorRangeFizeauOverlayGuiListItemText": "Color range",
+            "ColorRangeFullFizeauOverlayGuiListItemText": "Full",
+            "ColorRangeLimitedFizeauOverlayGuiListItemText": "Limited",
+            "ComponentsFizeauOverlayGuiCategoryHeaderText": "Components",
+            "FilterFizeauOverlayGuiCategoryHeaderText": "Filter",
+            "TemperatureFizeauOverlayGuiCategoryHeaderText": "Temperature: %u°K",
+            "SaturationFizeauOverlayGuiCategoryHeaderText": "Saturation: %.2f",
+            "HueFizeauOverlayGuiCategoryHeaderText": "Hue: %.2f",
+            "ContrastFizeauOverlayGuiCategoryHeaderText": "Contrast: %.2f",
+            "GammaFizeauOverlayGuiCategoryHeaderText": "Gamma: %.2f",
+            "LuminanceFizeauOverlayGuiCategoryHeaderText": "Luminance: %.2f"
+        }
+    )";
+    std::string lanPath = std::string("sdmc:/switch/.overlays/lang/") + APPTITLE + "/";
+    fsdevMountSdmc();
+    tsl::hlp::doWithSmSession([&lanPath, &jsonStr]{
+        tsl::tr::InitTrans(lanPath, jsonStr);
+    });
+    fsdevUnmountDevice("sdmc");
+
     tsl::hlp::doWithSmSession([this] {
         this->rc = fizeauInitialize();
     });
@@ -65,7 +112,7 @@ FizeauOverlayGui::FizeauOverlayGui() {
         return;
 
     if (this->rc = this->config.open_profile(perf_mode == ApmPerformanceMode_Normal ?
-                                 config.internal_profile : config.external_profile); R_FAILED(this->rc))
+        config.internal_profile : config.external_profile); R_FAILED(this->rc))
         return;
 
     this->is_day = Clock::is_in_interval(this->config.profile.dawn_begin, this->config.profile.dusk_begin);
@@ -78,25 +125,25 @@ FizeauOverlayGui::~FizeauOverlayGui() {
 
 tsl::elm::Element *FizeauOverlayGui::createUI() {
     this->info_header = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, s32 x, s32 y, s32 w, s32 h) {
-        renderer->drawString(format("Editing profile: %u", static_cast<std::uint32_t>(this->config.cur_profile_id) + 1).c_str(),
+        renderer->drawString(format("EditProfileFizeauOverlayGuiCustomDrawerText"_tr.c_str(), static_cast<std::uint32_t>(this->config.cur_profile_id) + 1).c_str(),
             false, x, y + 20, 20, renderer->a(0xffff));
-        renderer->drawString(format("In period: %s", this->is_day ? "day" : "night").c_str(),
+        renderer->drawString(format("ProfileInPeriodFizeauOverlayGuiCustomDrawerText"_tr.c_str(), this->is_day ? "ProfileInPeriodDayFizeauOverlayGuiCustomDrawerText"_tr.c_str() : "ProfileInPeriodNightFizeauOverlayGuiCustomDrawerText"_tr.c_str()).c_str(),
             false, x, y + 45, 20, renderer->a(0xffff));
     });
 
-    this->active_button = new tsl::elm::ListItem("Correction active");
+    this->active_button = new tsl::elm::ListItem("CorrectionFizeauOverlayGuiListItemText"_tr);
     this->active_button->setClickListener([this](std::uint64_t keys) {
         if (keys & HidNpadButton_A) {
             this->config.active ^= 1;
             this->rc = fizeauSetIsActive(this->config.active);
-            this->active_button->setValue(this->config.active ? "Active": "Inactive");
+            this->active_button->setValue(this->config.active ? "CorrectionActiveFizeauOverlayGuiListItemText"_tr: "CorrectionInactiveFizeauOverlayGuiListItemText"_tr);
             return true;
         }
         return false;
     });
-    this->active_button->setValue(this->config.active ? "Active": "Inactive");
+    this->active_button->setValue(this->config.active ? "CorrectionActiveFizeauOverlayGuiListItemText"_tr: "CorrectionInactiveFizeauOverlayGuiListItemText"_tr);
 
-    this->apply_button = new tsl::elm::ListItem("Apply settings");
+    this->apply_button = new tsl::elm::ListItem("ApplySettingsFizeauOverlayGuiListItemText"_tr);
     this->apply_button->setClickListener([this](std::uint64_t keys) {
         if (keys & HidNpadButton_A) {
             this->rc = this->config.apply();
@@ -157,7 +204,7 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
             val * (MAX_HUE - MIN_HUE) / 100 + MIN_HUE;
     });
 
-    this->components_bar = new tsl::elm::NamedStepTrackBar("", { "None", "R", "G", "RG", "B", "RB", "GB", "All" });
+    this->components_bar = new tsl::elm::NamedStepTrackBar("", { "NoneFizeauOverlayGuiNamedStepTrackBarText"_tr, "RedFizeauOverlayGuiNamedStepTrackBarText"_tr, "GreenFizeauOverlayGuiNamedStepTrackBarText"_tr, "RedGreenFizeauOverlayGuiNamedStepTrackBarText"_tr, "BlueFizeauOverlayGuiNamedStepTrackBarText"_tr, "RedBlueFizeauOverlayGuiNamedStepTrackBarText"_tr, "GreenBlueFizeauOverlayGuiNamedStepTrackBarText"_tr, "AllFizeauOverlayGuiNamedStepTrackBarText"_tr});
     this->components_bar->setProgress(static_cast<u8>(this->config.profile.components));
     this->components_bar->setClickListener([this](std::uint64_t keys) {
         if (keys & HidNpadButton_Y) {
@@ -171,7 +218,7 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
         this->config.profile.components = static_cast<Component>(val);
     });
 
-    this->filter_bar = new tsl::elm::NamedStepTrackBar("", { "None", "Red", "Green", "Blue" });
+    this->filter_bar = new tsl::elm::NamedStepTrackBar("", { "NoneFizeauOverlayGuiNamedStepTrackBarText"_tr, "RedFizeauOverlayGuiNamedStepTrackBarText"_tr, "GreenFizeauOverlayGuiNamedStepTrackBarText"_tr, "BlueFizeauOverlayGuiNamedStepTrackBarText"_tr });
     this->filter_bar->setProgress((this->config.profile.filter == Component_None) ? 0 : std::countr_zero(static_cast<std::uint32_t>(this->config.profile.filter)) + 1);
     this->filter_bar->setClickListener([this](std::uint64_t keys) {
         if (keys & HidNpadButton_Y) {
@@ -233,7 +280,7 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
             val * (MAX_LUMA - MIN_LUMA) / 100 + MIN_LUMA;
     });
 
-    this->range_button = new tsl::elm::ListItem("Color range");
+    this->range_button = new tsl::elm::ListItem("ColorRangeFizeauOverlayGuiListItemText"_tr);
     this->range_button->setClickListener([this](std::uint64_t keys) {
         if (keys & HidNpadButton_A) {
             auto &range = (this->is_day ? this->config.profile.day_settings.range : this->config.profile.night_settings.range);
@@ -241,23 +288,23 @@ tsl::elm::Element *FizeauOverlayGui::createUI() {
                 range = DEFAULT_LIMITED_RANGE;
             else
                 range = DEFAULT_RANGE;
-            this->range_button->setValue(is_full(range) ? "Full" : "Limited");
+            this->range_button->setValue(is_full(range) ? "ColorRangeFullFizeauOverlayGuiListItemText"_tr : "ColorRangeLimitedFizeauOverlayGuiListItemText"_tr);
             return true;
         }
         return false;
     });
-    this->range_button->setValue(is_full(this->is_day ? this->config.profile.day_settings.range : this->config.profile.night_settings.range) ? "Full" : "Limited");
+    this->range_button->setValue(is_full(this->is_day ? this->config.profile.day_settings.range : this->config.profile.night_settings.range) ? "ColorRangeFullFizeauOverlayGuiListItemText"_tr : "ColorRangeLimitedFizeauOverlayGuiListItemText"_tr);
 
     this->temp_header       = new tsl::elm::CategoryHeader("");
     this->sat_header        = new tsl::elm::CategoryHeader("");
     this->hue_header        = new tsl::elm::CategoryHeader("");
-    this->components_header = new tsl::elm::CategoryHeader("Components");
-    this->filter_header     = new tsl::elm::CategoryHeader("Filter");
+    this->components_header = new tsl::elm::CategoryHeader("ComponentsFizeauOverlayGuiCategoryHeaderText"_tr);
+    this->filter_header     = new tsl::elm::CategoryHeader("FilterFizeauOverlayGuiCategoryHeaderText"_tr);
     this->contrast_header   = new tsl::elm::CategoryHeader("");
     this->gamma_header      = new tsl::elm::CategoryHeader("");
     this->luma_header       = new tsl::elm::CategoryHeader("");
 
-    auto *frame = new tsl::elm::OverlayFrame("Fizeau", VERSION "-" COMMIT);
+    auto *frame = new tsl::elm::OverlayFrame("PluginName"_tr, VERSION);
     auto *list = new tsl::elm::List();
 
     list->addItem(this->info_header, 60);
@@ -291,17 +338,17 @@ void FizeauOverlayGui::update() {
 
     this->is_day = Clock::is_in_interval(this->config.profile.dawn_begin, this->config.profile.dusk_begin);
 
-    this->temp_header->setText(format("Temperature: %u°K",
+    this->temp_header->setText(format("TemperatureFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.temperature : this->config.profile.night_settings.temperature));
-    this->sat_header->setText(format("Saturation: %.2f",
+    this->sat_header->setText(format("SaturationFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.saturation  : this->config.profile.night_settings.saturation));
-    this->hue_header->setText(format("Hue: %.2f",
+    this->hue_header->setText(format("HueFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.hue         : this->config.profile.night_settings.hue));
-    this->contrast_header->setText(format("Contrast: %.2f",
+    this->contrast_header->setText(format("ContrastFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.contrast    : this->config.profile.night_settings.contrast));
-    this->gamma_header->setText(format("Gamma: %.2f",
+    this->gamma_header->setText(format("GammaFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.gamma       : this->config.profile.night_settings.gamma));
-    this->luma_header->setText(format("Luminance: %.2f",
+    this->luma_header->setText(format("LuminanceFizeauOverlayGuiCategoryHeaderText"_tr.c_str(),
         this->is_day ? this->config.profile.day_settings.luminance   : this->config.profile.night_settings.luminance));
 }
 

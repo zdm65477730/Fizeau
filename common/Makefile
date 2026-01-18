@@ -83,7 +83,6 @@ $(BUILD)/%.s.o: %.s %.S
 	@$(AS) -MMD -MP -x assembler-with-cpp $(ARCH) $(FLAGS) $(ASFLAGS) $(INCLUDE_FLAGS) -c $(CURDIR)/$< -o $@
 
 clean:
-	@echo Cleaning...
 	@rm -rf $(BUILD) $(OUT)
 
 -include $(DFILES)

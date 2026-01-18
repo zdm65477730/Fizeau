@@ -6,10 +6,8 @@ TOPDIR           ?=    $(CURDIR)
 
 # -----------------------------------------------
 
-APP_TITLE         =    Fizeau
-APP_TITLEID       =
-
-TARGET            =    Fizeau
+APP_TITLE         ?=   Fizeau
+TARGET            =    $(APP_TITLE)
 EXTENSION         =    nsp
 OUT               =    out
 BUILD             =    build
@@ -68,7 +66,7 @@ LIB_FLAGS         =    $(foreach dir,$(LIBS),-L$(dir)/lib)
 
 .SUFFIXES:
 
-.PHONY: all libs clean mrproper $(CUSTOM_LIBS)
+.PHONY: all libs clean $(CUSTOM_LIBS)
 
 all: $(NX_TARGET)
 
@@ -117,10 +115,7 @@ $(BUILD)/%.s.o: %.s %.S
 	@npdmtool $(NPDM_JSON) $@
 
 clean:
-	@echo Cleaning...
-	@rm -rf $(BUILD) $(OUT)
-
-mrproper: clean
 	@for dir in $(CUSTOM_LIBS); do $(MAKE) --no-print-directory -C $$dir clean; done
+	@rm -rf $(BUILD) $(OUT)
 
 -include $(DFILES)
