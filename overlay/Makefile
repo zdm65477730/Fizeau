@@ -6,13 +6,10 @@ TOPDIR           ?=    $(CURDIR)
 
 # -----------------------------------------------
 
-APP_TITLE         =    Fizeau
+APP_TITLE         ?=   Fizeau
 APP_AUTHOR        =    averne
 APP_ICON          =
-APP_VERSION       =    $(FZ_VERSION)
-APP_TITLEID       =
-
-TARGET            =    Fizeau
+TARGET            =    $(APP_TITLE)
 EXTENSION         =    ovl
 OUT               =    out
 BUILD             =    build
@@ -21,11 +18,11 @@ INCLUDES          =    include ../lib/libtesla/include
 CUSTOM_LIBS       =    ../common ../lib/inih
 ROMFS             =
 
-DEFINES           =    __SWITCH__ VERSION=\"$(FZ_VERSION)\" COMMIT=\"$(FZ_COMMIT)\"
+DEFINES           =    __SWITCH__ VERSION=\"$(FZ_VERSION)\" COMMIT=\"$(FZ_COMMIT)\" APPTITLE=\"$(APP_TITLE)\"
 ARCH              =    -march=armv8-a+crc+crypto+simd -mtune=cortex-a57 -mtp=soft -fpie
 FLAGS             =    -Wall -pipe -g -O2 -ffunction-sections -fdata-sections
 CFLAGS            =    -std=gnu11
-CXXFLAGS          =    -std=gnu++20 -fno-exceptions
+CXXFLAGS          =    -std=c++20 -fexceptions
 ASFLAGS           =
 LDFLAGS           =    -Wl,-pie -specs=$(DEVKITPRO)/libnx/switch.specs -g
 LINKS             =    -lcommon -linih -lnx
@@ -96,7 +93,7 @@ endif
 
 .SUFFIXES:
 
-.PHONY: all libs clean mrproper $(CUSTOM_LIBS)
+.PHONY: all libs clean $(CUSTOM_LIBS)
 
 all: $(NX_TARGET)
 
@@ -138,10 +135,7 @@ $(BUILD)/%.s.o: %.s %.S
 	@nacptool --create "$(APP_TITLE)" "$(APP_AUTHOR)" "$(APP_VERSION)" $@ $(NACPFLAGS)
 
 clean:
-	@echo Cleaning...
-	@rm -rf $(BUILD) $(OUT)
-
-mrproper: clean
 	@for dir in $(CUSTOM_LIBS); do $(MAKE) --no-print-directory -C $$dir clean; done
+	@rm -rf $(BUILD) $(OUT)
 
 -include $(DFILES)
