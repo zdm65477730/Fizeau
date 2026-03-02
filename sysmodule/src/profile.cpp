@@ -174,7 +174,9 @@ void ProfileManager::event_monitor_thread_func(void *args) {
 
         switch (idx) {
             case 0: {
-                ommGetOperationMode(&self->operation_mode);
+                OmmOperationMode om;
+                ommGetOperationMode(&om);
+                self->operation_mode = static_cast<AppletOperationMode>(om);
                 break;
             }
             case 1: {
@@ -199,8 +201,10 @@ Result ProfileManager::initialize() {
     if (auto rc = ommGetOperationModeChangeEvent(&this->operation_mode_event, false); R_FAILED(rc))
         diagAbortWithResult(rc);
 
-    if (auto rc = ommGetOperationMode(&this->operation_mode); R_FAILED(rc))
+    OmmOperationMode om;
+    if (auto rc = ommGetOperationMode(&om); R_FAILED(rc))
         diagAbortWithResult(rc);
+    this->operation_mode = static_cast<AppletOperationMode>(om);
 
     if (auto rc = insrGetReadableEvent(ins_evt_id, &this->activity_event); R_FAILED(rc))
         diagAbortWithResult(rc);
