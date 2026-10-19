@@ -1,5 +1,5 @@
 APP_TITLE =  Fizeau
-APP_VERSION = v2.8.2
+APP_VERSION = v2.8.3
 ifeq ($(RELEASE),)
 	APP_VERSION	:=	$(APP_VERSION)-$(shell git describe --always)
 endif
